@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KUIS MID MUSIK KELAS 7 - Oleh Zulkarnaen (100 SOAL)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
+    body { background: linear-gradient(135deg, #0d1b2a, #1b263b); color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 10px; overflow-x: hidden; }
+    
+    /* Anti-Cheat Overlay */
+    .cheat-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(230, 57, 70, 0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+    .cheat-warning h1 { font-size: 28px; color: #fff; margin-bottom: 15px; text-transform: uppercase; }
+    .cheat-warning p { font-size: 16px; color: #f8f9fa; margin-bottom: 20px; line-height: 1.5; }
+    .cheat-warning button { background: #fff; color: #e63946; font-size: 18px; font-weight: bold; padding: 12px 30px; border: none; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+    /* Header & Progress Bar */
+    .header { background: #1b263b; border-radius: 12px; padding: 12px 15px; border: 2px solid #f4a261; box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-bottom: 10px; }
+    .top-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .q-counter { font-size: 16px; font-weight: bold; color: #f4a261; }
+    .score-badge { background: #2a9d8f; padding: 4px 12px; border-radius: 15px; font-size: 14px; font-weight: bold; color: #fff; }
+    
+    /* Timer UI (1 Menit 30 Detik = 90s) */
+    .timer-container { width: 100%; background: #0d1b2a; border-radius: 10px; height: 16px; border: 1px solid #415a77; overflow: hidden; position: relative; }
+    .timer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #2a9d8f, #e76f51); transition: width 1s linear, background-color 0.5s; }
+    .timer-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px #000; }
+
+    /* Layout Main HP */
+    .main-card { background: #1b263b; border: 2px solid #415a77; border-radius: 15px; padding: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.4); flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .question-box { background: #0d1b2a; border: 1px solid #f4a261; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; line-height: 1.4; text-align: center; min-height: 90px; display: flex; align-items: center; justify-content: center; color: #f4a261; margin-bottom: 15px; }
+
+    /* Opsi Jawaban Grid HP */
+    .options-grid { display: flex; flex-direction: column; gap: 10px; }
+    .opt-btn { background: #2a3d54; border: 2px solid #415a77; color: #fff; padding: 12px 15px; border-radius: 10px; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; -webkit-tap-highlight-color: transparent; }
+    .opt-btn:active { transform: scale(0.98); }
+    .opt-prefix { background: #f4a261; color: #000; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; flex-shrink: 0; font-size: 13px; }
+    
+    .opt-btn.correct { background: #2a9d8f !important; border-color: #2a9d8f !important; color: #fff !important; }
+    .opt-btn.correct .opt-prefix { background: #fff; color: #2a9d8f; }
+    .opt-btn.wrong { background: #e63946 !important; border-color: #e63946 !important; color: #fff !important; }
+    .opt-btn.wrong .opt-prefix { background: #fff; color: #e63946; }
+
+    /* Action Controls */
+    .footer-actions { margin-top: 15px; text-align: center; }
+    .next-btn { background: #f4a261; color: #000; font-size: 16px; font-weight: bold; padding: 12px 30px; border: none; border-radius: 25px; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 1px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .next-btn:active { background: #e76f51; color: #fff; }
+
+    /* Status Grid Mini untuk HP */
+    .status-bar-mini { display: flex; justify-content: flex-start; gap: 4px; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #415a77; flex-shrink: 0; }
+    .status-dot.active { background: #f4a261; transform: scale(1.3); }
+    .status-dot.correct { background: #2a9d8f; }
+    .status-dot.wrong { background: #e63946; }
+
+    /* Start Screen Overlay */
+    .start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d1b2a; z-index: 8888; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+    .start-title { color: #f4a261; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+    .start-desc { color: #a8dadc; font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+    .rule-box { background: #1b263b; border: 1px solid #415a77; padding: 15px; border-radius: 10px; text-align: left; font-size: 13px; margin-bottom: 25px; width: 100%; max-width: 350px; }
+    .rule-box li { margin-bottom: 8px; color: #fff; }
+    .start-btn { background: #2a9d8f; color: #fff; font-size: 18px; font-weight: bold; padding: 15px 40px; border: none; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 12px rgba(42,157,143,0.4); }
+  </style>
+</head>
+<body>
+
+  <!-- Screen Peringatan Anti Curang -->
+  <div class="cheat-warning" id="cheat-screen">
+    <h1 id="cheat-title">PERINGATAN CURANG!</h1>
+    <p id="cheat-msg">Terdeteksi meninggalkan aplikasi / membuka tab lain!</p>
+    <button onclick="resumeQuiz()">LANJUTKAN KUIS</button>
+  </div>
+
+  <!-- Screen Awal / Start -->
+  <div class="start-screen" id="start-screen">
+    <div class="start-title">KUIS MID MUSIK KELAS 7 OLEH ZULKARNAEN (100 SOAL)</div>
+    <div class="start-desc">Sistem Kuis Online Anti-Curang & Pembentukan Karakter Siswa</div>
+    <div class="rule-box">
+      <strong style="color:#f4a261; display:block; margin-bottom:8px;">PERATURAN KUIS:</strong>
+      <ul>
+        <li>⏱️ **Waktu Soal:** 1 Menit 30 Detik (90 Detik) per soal.</li>
+        <li>🚫 **Dilarang Pindah Aplikasi:** Keluar dari browser/buka tab lain terdeteksi curang.</li>
+        <li>⚠️ **Batas Pelanggaran:** Maksimal 3 kali sebelum didiskualifikasi!</li>
+        <li>🔀 **Acak Pilihan:** Opsi jawaban diacak otomatis.</li>
+      </ul>
+    </div>
+    <button class="start-btn" onclick="startQuiz()">MULAI KUIS</button>
+  </div>
+
+  <!-- Header Section -->
+  <div class="header">
+    <div class="top-info">
+      <div class="q-counter" id="q-counter">Soal 1 / 100</div>
+      <div class="score-badge" id="score-badge">Poin: 0</div>
+    </div>
+    <div class="timer-container">
+      <div class="timer-bar" id="timer-bar"></div>
+      <div class="timer-text" id="timer-text">01:30</div>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="main-card">
+    <div>
+      <div class="question-box" id="question-box">Memuat soal...</div>
+      
+      <div class="options-grid" id="options-grid">
+        <!-- Opsi A-D di-render via JS -->
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <button class="next-btn" id="next-btn" onclick="nextQuestion()">Soal Berikutnya ➔</button>
+      <div class="status-bar-mini" id="status-dots"></div>
+    </div>
+  </div>
+
+  <script>
+    // Data Soal Lengkap 1 - 100
+    var allQuestions = [
+      // 1 
+      { q: "Penggunaan metronome pada komputer saat latihan bertujuan utama untuk...", options: ["Menentukan kencangnya suara nyanyian", "Menjaga ketepatan dan konsistensi tempo", "Mengatur tinggi rendahnya nada angklung", "Menggantikan peran guru dalam mengajar"], correctText: "Menjaga ketepatan dan konsistensi tempo" },
+      { q: "Rentang tempo 60-70 BPM yang digunakan guru termasuk dalam kategori tempo...", options: ["Sangat cepat (Presto)", "Cepat (Allegro)", "Sedang/Lambat (Andante / Adagio)", "Sangat cepat sekali (Prestissimo)"], correctText: "Sedang/Lambat (Andante / Adagio)" },
+      { q: "Penghitungan angka \"1, 2, 3, 4\" yang dinyanyikan secara keras bertujuan untuk...", options: ["Membantu siswa merasakan ketukan (beat) secara pasti", "Menghafal lirik lagu Ibu Kita Kartini", "Melatih kemampuan vokal nada tinggi", "Menentukan akor lagu yang akan dimainkan"], correctText: "Membantu siswa merasakan ketukan (beat) secara pasti" },
+      { q: "Istilah BPM dalam pengaturan tempo musik merupakan singkatan dari...", options: ["Beat Per Minute", "Bass Per Minute", "Bar Per Minute", "Band Per Minute"], correctText: "Beat Per Minute" },
+      { q: "Ketika tepuk tangan dilakukan pada setiap suku kata nama sesuai beat metronom, kegiatan tersebut melatih...", options: ["Harmoni vokal", "Artikulasi nada", "Sensitivitas ritme dan tempo", "Ketangkasan bermain angklung"], correctText: "Sensitivitas ritme dan tempo" },
+      { q: "Jika nama seorang siswa adalah \"SAB-RI-NA\", maka jumlah tepukan tangan yang dilakukan sesuai beat adalah...", options: ["2 tepukan", "3 tepukan", "4 tepukan", "5 tepukan"], correctText: "3 tepukan" },
+      { q: "Satuan untuk mengukur kecepatan tempo musik adalah...", options: ["Hertz (Hz)", "Decibel (dB)", "Beat Per Minute (BPM)", "Oktav"], correctText: "Beat Per Minute (BPM)" },
+      { q: "Perubahan tempo dari 60 BPM menjadi 70 BPM menandakan bahwa musik berjalan...", options: ["Semakin lambat", "Semakin cepat", "Semakin keras", "Semakin pelan"], correctText: "Semakin cepat" },
+      { q: "Menghitung \"1, 2, 3, 4\" secara berulang mengindikasikan bahwa lagu yang dipelajari menggunakan birama...", options: ["2/4", "3/4", "4/4", "6/8"], correctText: "4/4" },
+      { q: "Fungsi alat musik metronom dalam sebuah ansambel musik adalah sebagai...", options: ["Penentu melodi utama", "Acuan tempo dan ritme dasar", "Pengatur dinamika suara", "Pelengkap nada bass"], correctText: "Acuan tempo dan ritme dasar" },
+
+      { q: "Kegiatan tepuk tangan ke arah depan, kiri, kanan, dan atas melatih keterampilan...", options: ["Peningkatan jangkauan nada", "Koordinasi motorik dan kepekaan ritmis", "Penguasaan instrumen terompet", "Teknik pernapasan diafragma"], correctText: "Koordinasi motorik dan kepekaan ritmis" },
+      { q: "Urutan tepukan pada tahapan ke-3 skenario pembelajaran adalah...", options: ["Depan -> Kiri -> Kanan -> Atas", "Paha -> Kiri -> Kanan -> Atas", "Atas -> Paha -> Kanan -> Kiri", "Kiri -> Kanan -> Depan -> Atas"], correctText: "Paha -> Kiri -> Kanan -> Atas" },
+      { q: "Aktivitas berdiri, mengangkat kaki kanan, mengangkat kaki kiri, lalu menghadap kanan dan kiri bermanfaat untuk...", options: ["Menghafal nada C, D, E, F, G", "Menyelaraskan gerak tubuh dengan ketukan tempo", "Mengatur pernapasan saat bernyanyi", "Memilih instrumen yang tepat"], correctText: "Menyelaraskan gerak tubuh dengan ketukan tempo" },
+      { q: "Penggunaan gerak anggota tubuh untuk menghasilkan ritme musik disebut...", options: ["Vokal grup", "Body percussion (Perkusi tubuh)", "Solfeggio", "Akustik"], correctText: "Body percussion (Perkusi tubuh)" },
+      { q: "Gerakan tubuh yang tidak sesuai dengan ketukan metronom menunjukkan bahwa siswa...", options: ["Belum menjaga konsistensi tempo", "Memiliki nada vokal yang bagus", "Sudah menguasai akor C Mayor", "Sangat mahir bermain drum"], correctText: "Belum menjaga konsistensi tempo" },
+      { q: "Saat tepuk tangan mengarah ke paha pada hitungan ke-3, yang harus diperhatikan adalah...", options: ["Bunyi suara vokal", "Ketepatan waktu tepukan dengan bunyi metronom", "Kerentanan alat musik angklung", "Pencahayaan dari proyektor"], correctText: "Ketepatan waktu tepukan dengan bunyi metronom" },
+      { q: "Latihan variasi arah tepukan termasuk bentuk pembelajaran kinestetik untuk...", options: ["Memahami tempo secara visual", "Memahami tempo secara auditori dan fisik", "Memahami harmoni akor", "Menghafal lirik lagu"], correctText: "Memahami tempo secara auditori dan fisik" },
+      { q: "Jika satu gerakan dilakukan setiap 1 beat pada tempo 60 BPM, maka jeda waktu antar gerakan adalah...", options: ["0,5 detik", "1,0 detik", "2,0 detik", "1,5 detik"], correctText: "1,0 detik" },
+      { q: "Manfaat utama menggabungkan gerak fisik dengan tempo musik pada siswa SMP adalah...", options: ["Agar siswa cepat lelah", "Memudahkan pemahaman konsep ritme secara nyata", "Mengurangi durasi waktu belajar", "Mengganti kebutuhan alat musik"], correctText: "Memudahkan pemahaman konsep ritme secara nyata" },
+      { q: "Fokus utama guru saat memberikan latihan gerakan kaki dan tepukan adalah...", options: ["Keseragaman tinggi badan siswa", "Kecepatan reaksi tubuh terhadap beat tempo", "Keindahan pakaian siswa", "Volume suara nyanyian siswa"], correctText: "Kecepatan reaksi tubuh terhadap beat tempo" },
+
+      { q: "Pada simulasi drumset, anggota tubuh yang dimainkan bersamaan pada hitungan 1 dan 3 adalah...", options: ["Tangan kanan dan tangan kiri", "Kaki kanan dan tangan kanan", "Kaki kiri dan tangan kiri", "Kaki kanan dan tangan kiri"], correctText: "Kaki kanan dan tangan kanan" },
+      { q: "Anggota tubuh yang dimainkan bersamaan pada hitungan 2 dan 4 adalah...", options: ["Kaki kanan dan tangan kanan", "Tangan kanan dan tangan kiri", "Kaki kiri dan tangan kiri", "Kaki kanan dan kaki kiri"], correctText: "Tangan kanan dan tangan kiri" },
+      { q: "Dalam simulasi drumset ini, tangan kanan dimainkan pada hitungan...", options: ["1 dan 3 saja", "2 dan 4 saja", "Hitungan 1, 2, 3, dan 4 (Setiap hitungan)", "Hanya hitungan 1"], correctText: "Hitungan 1, 2, 3, dan 4 (Setiap hitungan)" },
+      { q: "Kaki kanan pada simulasi drumset mengimitasi peran instrumen drum berupa...", options: ["Snare drum", "Bass drum (Kick drum)", "Hi-hat/Cymbal", "Tom-tom"], correctText: "Bass drum (Kick drum)" },
+      { q: "Kombinasi tangan kanan dan tangan kiri pada hitungan 2 dan 4 mengimitasi permainan...", options: ["Bass drum dan Hi-hat", "Hi-hat dan Snare drum", "Crash Cymbal saja", "Ride Cymbal saja"], correctText: "Hi-hat dan Snare drum" },
+      { q: "Kriteria siswa yang dipilih menjadi pemain drumset adalah...", options: ["Siswa yang bersuara paling keras", "Siswa yang berhasil melakukan simulasi drumset sesuai tempo", "Siswa yang duduk di barisan depan", "Siswa yang paling cepat menghafal lirik"], correctText: "Siswa yang berhasil melakukan simulasi drumset sesuai tempo" },
+      { q: "Mengapa koordinasi antara tangan dan kaki sangat penting bagi seorang pemain drum?", options: ["Agar lagu terdengar lebih nyaring", "Untuk menjaga ritme dan tempo lagu tetap stabil", "Agar penampilan terlihat menarik di proyektor", "Untuk menentukan tinggi nada instrumen lain"], correctText: "Untuk menjaga ritme dan tempo lagu tetap stabil" },
+      { q: "Jika metronom diatur 60 BPM, berapa kali kaki kanan menginjak bass drum dalam 1 menit (hitungan 1 dan 3)?", options: ["15 kali", "30 kali", "60 kali", "120 kali"], correctText: "30 kali" },
+      { q: "Tingkat kesulitan tertinggi pada latihan simulasi drumset terletak pada...", options: ["Menghafal angka 1 sampai 4", "Memisahkan gerak tangan dan kaki secara independen", "Memegang stik drum", "Membaca teks di layar proyektor"], correctText: "Memisahkan gerak tangan dan kaki secara independen" },
+      { q: "Peran utama drumset dalam lagu ansambel seperti \"Ibu Kita Kartini\" adalah...", options: ["Memainkan melodi utama", "Menjaga tempo dan memberikan fondasi ritmik", "Mengisi harmoni akor", "Menyanyikan syair lagu"], correctText: "Menjaga tempo dan memberikan fondasi ritmik" },
+
+      { q: "Media pendukung yang digunakan guru saat latihan menyanyi lagu Ibu Kita Kartini adalah...", options: ["Rekaman vokal asli", "Musik Minus One dan Layar Proyektor", "Partitur kertas tanpa audio", "Radio FM"], correctText: "Musik Minus One dan Layar Proyektor" },
+      { q: "Pengertian dari musik Minus One adalah...", options: ["Musik pengiring tanpa jalurnya vokal utama", "Musik yang hanya berisi instrumen drum saja", "Musik yang temponya dikurangi jadi sangat lambat", "Rekaman lagu tanpa instrumen musik"], correctText: "Musik pengiring tanpa jalurnya vokal utama" },
+      { q: "Cara guru memilih calon penyanyi utama adalah dengan mendengarkan siswa menyanyikan...", options: ["Seluruh bait lagu", "Satu kalimat lagu Ibu Kita Kartini", "Satu nada akor C", "Hitungan 1 sampai 4"], correctText: "Satu kalimat lagu Ibu Kita Kartini" },
+      { q: "Fasilitas/alat yang diberikan kepada penyanyi terbaik adalah...", options: ["Set angklung lengkap", "Mikrofon dan kesempatan bernyanyi melihat layar proyektor", "Metronom pribadi", "Stik drum"], correctText: "Mikrofon dan kesempatan bernyanyi melihat layar proyektor" },
+      { q: "Fungsi proyektor dalam kegiatan bernyanyi bersama ini adalah...", options: ["Menampilkan gambar pencipta lagu", "Menampilkan lirik/partitur lagu agar mudah dibaca bersama", "Memberikan pencahayaan panggung", "Mengukur kecepatan tempo secara otomatis"], correctText: "Menampilkan lirik/partitur lagu agar mudah dibaca bersama" },
+      { q: "Penggunaan minus one membantu siswa dalam latihan vokal untuk...", options: ["Menyanyi bebas tanpa terikat ketukan", "Menyesuaikan nada vokal (pitch) dan ketukan tempo pengiring", "Menggantikan peran penyanyi utama", "Mengatur volume mikrofon"], correctText: "Menyesuaikan nada vokal (pitch) dan ketukan tempo pengiring" },
+      { q: "Lagu \"Ibu Kita Kartini\" diciptakan oleh...", options: ["C. Simanjuntak", "W.R. Soepratman", "Ismail Marzuki", "L. Manik"], correctText: "W.R. Soepratman" },
+      { q: "Bagi siswa yang tidak mendapatkan alat musik angklung maupun drumset, tugas mereka adalah...", options: ["Menjadi penonton saja", "Membantu memegang proyektor", "Ikut serta menyanyikan lagu", "Memutar metronom"], correctText: "Ikut serta menyanyikan lagu" },
+
+      { q: "Nada pembentuk Akor C Mayor pada Kelompok 1 terdiri dari nada...", options: ["C - E - G", "D - F - A", "F - A - C", "G - B - D"], correctText: "C - E - G" },
+      { q: "Kelompok 2 memainkan Akor Dm (D minor) yang terdiri dari nada...", options: ["C - E - G", "D - F - A", "F - A - C", "G - B - D"], correctText: "D - F - A" },
+      { q: "Susunan nada F - A - C merupakan pembentuk akor...", options: ["C Mayor", "D minor", "F Mayor", "G Mayor"], correctText: "F Mayor" },
+      { q: "Akor G Mayor yang dimainkan oleh Kelompok 4 terdiri dari susunan nada...", options: ["C - E - G", "D - F - A", "F - A - C", "G - B - D"], correctText: "G - B - D" },
+      { q: "Berdasarkan jenisnya, instrumen musik Angklung dimainkan dengan cara...", options: ["Dipukul", "Digoyang / Digetarkan", "Ditiup", "Dipetik"], correctText: "Digoyang / Digetarkan" },
+      { q: "Jenis akor Dm (D minor) memiliki karakter suara yang cenderung terasa berbeda dari akor Mayor, yaitu...", options: ["Gembira dan terang", "Sedih / Khas Minor", "Keras dan cepat", "Tanpa nada"], correctText: "Sedih / Khas Minor" },
+      { q: "Jika total siswa 26 orang, 1 drummer, 1 penyanyi utama, sisanya terbagi rata ke 4 kelompok angklung, berapa isi per kelompok?", options: ["4 orang", "6 orang (ada kelompok 6 & 6)", "6 orang pas", "7 orang"], correctText: "6 orang (ada kelompok 6 & 6)" },
+      { q: "Setiap kelompok angklung memainkan kombinasi nada pembentuk akor. Pembagian tugas ini dinamakan...", options: ["Ansambel musik yang harmonis", "Solo vokal", "Musik Monofonik", "A cappella"], correctText: "Ansambel musik yang harmonis" },
+      { q: "Ketika Kelompok 1 membunyikan angklung nada C, E, dan G secara bersamaan sesuai ketukan, bunyi yang dihasilkan disebut...", options: ["Melodi", "Akor (Harmoni)", "Ritme", "Tempo"], correctText: "Akor (Harmoni)" },
+      { q: "Saat mengiringi lagu dengan angklung, ketepatan menggoyangkan angklung sangat tergantung pada...", options: ["Warna angklung", "Patokan ketukan tempo dari drumset/metronom", "Besar kecilnya ukuran angklung", "Jumlah lirik lagu"], correctText: "Patokan ketukan tempo dari drumset/metronom" },
+      { q: "Fungsi utama pembagian kelompok angklung berdasarkan akor (C, Dm, F, G) dalam lagu adalah...", options: ["Sebagai pengiring harmoni lagu", "Sebagai penentu tempo", "Sebagai penyanyi latar", "Sebagai pengatur vokal"], correctText: "Sebagai pengiring harmoni lagu" },
+      { q: "Kolaborasi penyanyi, pemain drum, pengisi akor angklung, dan paduan suara kelas membentuk penyajikan...", options: ["Musik Tunggal", "Ansambel Musik", "Resital Vokal", "Karawitan"], correctText: "Ansambel Musik" },
+
+      // 51 - 100 (Pengertian Musik, Dasar Musik, Karakter Siswa, Kebangsaan, Mars Sekolah)
+      { q: "Secara umum, pengertian musik adalah...", options: ["Kumpulan suara atau bunyi yang diatur sedemikian rupa sehingga memiliki irama, lagu, dan keharmonisan", "Coretan warna pada media kanvas yang membentuk keindahan", "Gerakan tubuh yang dilakukan secara berulang sesuai dengan cerita", "Kumpulan kata-kata indah yang dirangkai tanpa nada"], correctText: "Kumpulan suara atau bunyi yang diatur sedemikian rupa sehingga memiliki irama, lagu, dan keharmonisan" },
+      { q: "Rangkaian dari sejumlah nada atau bunyi berdasarkan tinggi rendahnya yang teratur disebut...", options: ["Melodi", "Irama / Ritme", "Akor", "Dinamika"], correctText: "Melodi" },
+      { q: "Unsur dasar musik yang mengatur panjang pendeknya bunyi dan alur ketukan waktu adalah...", options: ["Dinamika", "Ritme / Irama", "Harmoni", "Timbre"], correctText: "Ritme / Irama" },
+      { q: "Bunyi gabungan dua nada atau lebih yang dibunyikan secara bersamaan sehingga terdengar selaras disebut...", options: ["Melodi", "Harmoni / Akor", "Tempo", "Vokal"], correctText: "Harmoni / Akor" },
+      { q: "Keras lembutnya suara yang dinyanyikan atau dimainkan dalam sebuah musik dinamakan...", options: ["Dinamika", "Tempo", "Pitch", "Gaya"], correctText: "Dinamika" },
+      { q: "Kualitas atau warna bunyi yang membedakan satu instrumen dengan instrumen lainnya dinamakan...", options: ["Timbre", "Melodi", "Tangga nada", "Birama"], correctText: "Timbre" },
+      { q: "Susunan berjenjang dari nada-nada pokok suatu sistem nada, misalnya do, re, mi, fa, sol, la, si, do disebut...", options: ["Tangga Nada", "Akor", "Dinamika", "Irama"], correctText: "Tangga Nada" },
+      { q: "Alat musik yang berfungsi memainkan melodi utama dalam lagu dinamakan alat musik...", options: ["Melodis", "Ritmis", "Harmonis", "Pengiring"], correctText: "Melodis" },
+      { q: "Alat musik yang tidak memiliki nada tetap dan berfungsi menjaga ketukan/ritme dinamakan alat musik...", options: ["Ritmis", "Melodis", "Harmonis", "Solfeggio"], correctText: "Ritmis" },
+      { q: "Alat musik yang berfungsi untuk memainkan akor dan mengiringi lagu dinamakan alat musik...", options: ["Harmonis", "Melodis", "Ritmis", "Perkusi"], correctText: "Harmonis" },
+
+      { q: "Mengapa belajar musik sangat penting untuk pembentukan karakter siswa di sekolah?", options: ["Melatih kedisiplinan, kesabaran, dan konsentrasi tinggi", "Agar bisa menjadi artis terkenal secara instan", "Supaya bisa berteriak sesuka hati di dalam kelas", "Menghindari pelajaran teori di kelas"], correctText: "Melatih kedisiplinan, kesabaran, dan konsentrasi tinggi" },
+      { q: "Saat teman sedang melakukan kesalahan saat bernyanyi atau bermain musik, sikap yang benar adalah...", options: ["Tidak mengejek dan memberikan semangat serta saran perbaikan", "Tertawa terbahak-bahak di depan kelas", "Menyuruh teman tersebut keluar dari kelompok", "Memarahi teman dengan kata-kata kasar"], correctText: "Tidak mengejek dan memberikan semangat serta saran perbaikan" },
+      { q: "Mengucapkan kata-kata kotor atau kasar saat pembelajaran kelompok musik merupakan tindakan...", options: ["Tidak terpuji dan merusak suasana keharmonisan kelompok", "Tanda keberanian dan ketegasan siswa", "Hal biasa yang diperbolehkan dalam seni", "Trik untuk menaikkan semangat berteman"], correctText: "Tidak terpuji dan merusak suasana keharmonisan kelompok" },
+      { q: "Keuntungan utama latihan ansambel musik bersama bagi sikap siswa adalah melatih...", options: ["Sikap saling menghargai dan tidak egois", "Keinginan untuk menonjolkan diri sendiri", "Kemampuan berdebat dengan teman", "Kemampuan menguasai semua alat musik sendirian"], correctText: "Sikap saling menghargai dan tidak egois" },
+      { q: "Jika seorang siswa susah diatur dan tidak mau mengikuti instruksi tempo dari guru, dampak yang terjadi adalah...", options: ["Permainan musik menjadi kacau dan tidak harmonis", "Hasil musik menjadi sangat unik dan bagus", "Teman-teman lain akan semakin senang", "Lagu selesai lebih cepat dari biasanya"], correctText: "Permainan musik menjadi kacau dan tidak harmonis" },
+      { q: "Nilai utama yang diajarkan dalam menjaga ketertiban saat latihan musik bersama adalah...", options: ["Kedisiplinan dan kepatuhan pada aturan bersama", "Kebebasan tanpa batas bagi setiap individu", "Kecepatan menyelesaikan latihan tanpa peduli hasil", "Kemampuan mempengaruhi teman untuk tidak belajar"], correctText: "Kedisiplinan dan kepatuhan pada aturan bersama" },
+      { q: "Mengapa mengejek kemampuan bernyanyi teman dilarang keras saat pembelajaran Seni Musik?", options: ["Dapat merusak rasa percaya diri dan menurunkan semangat belajar teman", "Dapat membuat suara guru menjadi serak", "Membuat lagu menjadi lebih panjang", "Mengurangi waktu istirahat sekolah"], correctText: "Dapat merusak rasa percaya diri dan menurunkan semangat belajar teman" },
+      { q: "Tindakan yang menunjukkan sikap tertib saat pembelajaran musik di kelas adalah...", options: ["Mendengarkan instruksi guru dan fokus pada bagian musiknya", "Bermain alat musik sendiri saat guru sedang menjelaskan", "Ngobrol dengan teman sebelah ketika latihan berlangsung", "Keluar masuk kelas tanpa izin guru"], correctText: "Mendengarkan instruksi guru dan fokus pada bagian musiknya" },
+      { q: "Sikap luhur yang tercipta ketika setiap anggota musik mau menahan diri dan bermain sesuai porsi dinamakan...", options: ["Tenggang rasa dan toleransi", "Egoisme tinggi", "Sikap apatis", "Persaingan tidak sehat"], correctText: "Tenggang rasa dan toleransi" },
+      { q: "Bahasa tutur yang halus dan sopan dalam interaksi kelompok musik akan menciptakan...", options: ["Lingkungan belajar yang nyaman, damai, dan kompak", "Suasana belajar yang menegangkan", "Kekecewaan pada teman satu tim", "Penurunan nilai seni di sekolah"], correctText: "Lingkungan belajar yang nyaman, damai, dan kompak" },
+
+      { q: "Tujuan utama menyanyikan lagu-lagu nasional dan Indonesia Raya adalah untuk...", options: ["Menumbuhkan rasa cinta tanah air dan nasionalisme", "Sekadar memenuhi formalitas kegiatan upacara", "Memamerkan keindahan suara di depan umum", "Menghabiskan waktu jam pelajaran"], correctText: "Menumbuhkan rasa cinta tanah air dan nasionalisme" },
+      { q: "Sikap tubuh yang benar dan wajib dilakukan saat menyanyikan lagu kebangsaan Indonesia Raya adalah...", options: ["Berdiri tegak, khidmat, dan penuh rasa hormat", "Duduk bersandar sambil melambaikan tangan", "Berdiri santai sambil berbicara dengan teman", "Berjalan-jalan di area lapangan"], correctText: "Berdiri tegak, khidmat, dan penuh rasa hormat" },
+      { q: "Menyanyikan lagu Mars Sekolah memiliki arti penting bagi siswa yaitu...", options: ["Memupuk rasa bangga, kebersamaan, dan identitas sekolah", "Mengingat nama-nama guru di sekolah", "Persyaratan untuk lulus ujian nasional", "Latihan vokal agar suara menjadi keras"], correctText: "Memupuk rasa bangga, kebersamaan, dan identitas sekolah" },
+      { q: "Lagu nasional dinyanyikan dengan penuh penghayatan bertujuan untuk mengenang...", options: ["Jasa dan perjuangan para pahlawan bangsa", "Kisah-kisah fiksi masa lalu", "Nama-nama tempat wisata di Indonesia", "Pengalaman pribadi masing-masing siswa"], correctText: "Jasa dan perjuangan para pahlawan bangsa" },
+      { q: "Menyanyikan lagu Mars Sekolah saat upacara atau acara resmi bermanfaat untuk meningkatkan...", options: ["Semangat persatuan dan rasa kekeluargaan antar siswa", "Keinginan untuk bersaing antar kelas secara tidak sehat", "Rasa lelah siswa saat berdiri", "Volume pengeras suara sekolah"], correctText: "Semangat persatuan dan rasa kekeluargaan antar siswa" },
+      { q: "Lagu kebangsaan Indonesia Raya diciptakan oleh komponis nasional yaitu...", options: ["Wage Rudolf Soepratman", "Ismail Marzuki", "Kusbini", "Ibu Soed"], correctText: "Wage Rudolf Soepratman" },
+      { q: "Nilai kebangsaan yang dapat dipetik saat bernyanyi lagu daerah dan nasional secara bersama-sama adalah...", options: ["Persatuan dalam kebhinekaan (Bhinneka Tunggal Ika)", "Perbedaan suku yang memisahkan berteman", "Rasa unggul dari daerah sendiri", "Kesenjangan sosial antar sesama"], correctText: "Persatuan dalam kebhinekaan (Bhinneka Tunggal Ika)" },
+      { q: "Bila seorang siswa bercanda atau tidak serious saat lagu Indonesia Raya dikumandangkan, tindakan tersebut...", options: ["Menunjukkan sikap tidak menghormati lambang dan lagu kebangsaan", "Merupakan hal biasa yang wajar dilakukan siswa", "Boleh dilakukan jika cuaca panas", "Sangat disukai oleh teman-teman"], correctText: "Menunjukkan sikap tidak menghormati lambang dan lagu kebangsaan" },
+      { q: "Mars sekolah biasanya memuat pesan-pesan moral tentang...", options: ["Visi, misi, semangat belajar, dan cita-cita sekolah", "Sejarah berdiri kota tempat sekolah berada", "Daftar peraturan hukuman sekolah", "Nasihat tentang cara mencari uang"], correctText: "Visi, misi, semangat belajar, dan cita-cita sekolah" },
+      { q: "Menyanyikan lagu-lagu perjuangan dengan tempo cepat dan tegas biasanya bertujuan memanggil perasaan...", options: ["Semangat, keberanian, dan patriotisme", "Kesedihan dan rasa putus asa", "Mimpi dan keinginan untuk tidur", "Ketakutan terhadap musuh"], correctText: "Semangat, keberanian, dan patriotisme" },
+
+      { q: "Suara manusia yang dihasilkan dari artikulasi ucapan dan pernapasan disebut seni...", options: ["Vokal", "Musik Instrumen", "Pantomim", "Tari"], correctText: "Seni Vokal" },
+      { q: "Teknik pernapasan yang paling baik digunakan dalam bernyanyi adalah pernapasan...", options: ["Diafragma", "Dada", "Perut", "Hidung"], correctText: "Diafragma" },
+      { q: "Kejelasan dalam mengucapkan kata demi kata pada lirik lagu disebut...", options: ["Artikulasi", "Phrasering", "Intonasi", "Resonansi"], correctText: "Artikulasi" },
+      { q: "Ketepatan penyanyi dalam menjangkau tinggi rendahnya nada (pitch) dinamakan...", options: ["Intonasi", "Artikulasi", "Timbre", "Ambitus"], correctText: "Intonasi" },
+      { q: "Pemenggalan kalimat lagu yang benar sesuai kaidah tata bahasa dinamakan...", options: ["Phrasering", "Vibrato", "Relaksasi", "Modulasi"], correctText: "Phrasering" },
+      { q: "Kelompok bernyanyi yang terdiri dari banyak penyanyi dan terbagi atas beberapa jenis suara disebut...", options: ["Paduan Suara (Chorus)", "Band Rock", "Solo Vokal", "Kwartet"], correctText: "Paduan Suara (Chorus)" },
+      { q: "Jenis suara tinggi pada perempuan dewasa/remaja dinamakan...", options: ["Sopran", "Alto", "Tenor", "Bass"], correctText: "Sopran" },
+      { q: "Jenis suara rendah pada perempuan dewasa/remaja dinamakan...", options: ["Alto", "Sopran", "Mezzo Sopran", "Tenor"], correctText: "Alto" },
+      { q: "Jenis suara tinggi pada laki-laki dewasa/remaja dinamakan...", options: ["Tenor", "Bass", "Bariton", "Alto"], correctText: "Tenor" },
+      { q: "Jenis suara rendah pada laki-laki dewasa/remaja dinamakan...", options: ["Bass", "Tenor", "Bariton", "Sopran"], correctText: "Bass" },
+
+      { q: "Bernyanyi secara bersama-sama dengan satu suara melodi yang sama dinamakan...", options: ["Bernyanyi Unisono", "Bernyanyi Acappella", "Bernyanyi Canon", "Bernyanyi Solo"], correctText: "Bernyanyi Unisono" },
+      { q: "Bernyanyi bersama tanpa diiringi oleh alat musik dinamakan...", options: ["Acappella", "Canon", "Nasyid", "Unisono"], correctText: "Acappella" },
+      { q: "Teknik bernyanyi bersusulan antara kelompok satu dengan kelompok lain dinamakan lagu...", options: ["Canon", "Unisono", "Harmoni", "Duet"], correctText: "Canon" },
+      { q: "Musik ansambel yang semua alat musiknya sejenis (misal: angklung semua) dinamakan ansambel...", options: ["Sejenis", "Campuran", "Harmonis", "Tradisional"], correctText: "Sejenis" },
+      { q: "Musik ansambel yang terdiri dari berbagai jenis instrumen berbeda dinamakan ansambel...", options: ["Campuran", "Sejenis", "Vokal", "Nusantara"], correctText: "Campuran" },
+      { q: "Sikap yang paling mulia ketika mendengarkan kelompok lain tampil di depan kelas adalah...", options: ["Menyimak dengan tenang dan memberikan tepuk tangan apresiasi", "Mengobrol sendiri dengan suara keras", "Mengeritik dengan bahasa kasar", "Meninggalkan ruangan kelas"], correctText: "Menyimak dengan tenang dan memberikan tepuk tangan apresiasi" },
+      { q: "Kedisiplinan hadir tepat waktu saat latihan musik kelompok akan berdampak pada...", options: ["Efisiensi waktu dan hasil latihan yang maksimal", "Rasa bosan bagi teman yang menunggu", "Siswa lain menjadi malas", "Pembatalan penampilan musik"], correctText: "Efisiensi waktu dan hasil latihan yang maksimal" },
+      { q: "Tujuan utama pengulangan latihan musik (gladi bersih) sebelum tampil adalah...", options: ["Memantapkan mental, kekompakan, dan meminimalisir kesalahan", "Membuat anggota kelompok merasa lelah", "Menghabiskan anggaran sekolah", "Menguji daya tahan alat musik"], correctText: "Memantapkan mental, kekompakan, dan meminimalisir kesalahan" },
+      { q: "Indonesia Tanah Airku, pada lagu Indonesia Raya, SIA berada pada hitungan ...", options: ["1", "3", "4", "2"], correctText: "2" },
+      { q: "Perasaan bahagia dan bangga setelah berhasil menyajikan musik bersama tim mengajarkan kita bahwa...", options: ["Keberhasilan besar diraih melalui kerja sama dan proses yang tekun", "Hasil bagus bisa didapat secara kebetulan tanpa latihan", "Hanya pemain instrumen utama yang paling penting", "Latihan musik tidak ada gunanya"], correctText: "Keberhasilan besar diraih melalui kerja sama dan proses yang tekun" }
+    ];
+
+    // Variables Game
+    var currentQIndex = 0;
+    var totalScore = 0;
+    var timerInterval = null;
+    var QUESTION_TIME = 90; // Diubah menjadi 1 Menit 30 Detik (90 Detik) per soal
+    var timeLeft = QUESTION_TIME;
+    var cheatCount = 0;
+    var MAX_CHEATS = 3;
+    var isAnswered = false;
+    var userAnswers = [];
+
+    // Helper: Shuffle Array (Acak Opsi Jawaban)
+    function shuffleArray(array) {
+      var arr = array.slice();
+      for (var i = arr.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+      }
+      return arr;
+    }
+
+    // Anti Curang: Event Listener Pindah Tab / Minimalize
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden && document.getElementById("start-screen").style.display === "none") {
+        handleCheatViolation("Terdeteksi meninggalkan aplikasi kuis!");
+      }
+    });
+
+    window.addEventListener("blur", function() {
+      if (document.getElementById("start-screen").style.display === "none") {
+        handleCheatViolation("Terdeteksi keluar dari jendela kuis!");
+      }
+    });
+
+    // Anti Context Menu & Copy Paste
+    document.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "F12" || (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) || (e.ctrlKey && e.key === "u")) {
+        e.preventDefault();
+        handleCheatViolation("Terdeteksi mencoba membuka DevTools!");
+      }
+    });
+
+    function handleCheatViolation(reason) {
+      cheatCount++;
+      clearInterval(timerInterval);
+      
+      var cheatScreen = document.getElementById("cheat-screen");
+      var cheatTitle = document.getElementById("cheat-title");
+      var cheatMsg = document.getElementById("cheat-msg");
+
+      if (cheatCount >= MAX_CHEATS) {
+        cheatTitle.innerText = "DISKUALIFIKASI!";
+        cheatMsg.innerText = "Anda telah melanggar aturan anti-curang sebanyak 3 kali.\nKuis dihentikan secara otomatis.";
+        cheatScreen.querySelector("button").style.display = "none";
+        cheatScreen.style.display = "flex";
+      } else {
+        cheatTitle.innerText = `PERINGATAN CURANG (${cheatCount}/${MAX_CHEATS})`;
+        cheatMsg.innerText = reason + "\n\nJangan tinggalkan kuis atau membuka tab lain!";
+        cheatScreen.style.display = "flex";
+      }
+    }
+
+    function resumeQuiz() {
+      document.getElementById("cheat-screen").style.display = "none";
+      if (!isAnswered) startTimer();
+    }
+
+    function startQuiz() {
+      document.getElementById("start-screen").style.display = "none";
+      initStatusDots();
+      loadQuestion();
+    }
+
+    function initStatusDots() {
+      var container = document.getElementById("status-dots");
+      container.innerHTML = "";
+      for (var i = 0; i < allQuestions.length; i++) {
+        var dot = document.createElement("div");
+        dot.className = "status-dot";
+        dot.id = "dot-" + i;
+        container.appendChild(dot);
+      }
+    }
+
+    function updateStatusDots() {
+      for (var i = 0; i < allQuestions.length; i++) {
+        var dot = document.getElementById("dot-" + i);
+        if (i === currentQIndex) {
+          dot.className = "status-dot active";
+        } else if (userAnswers[i] === true) {
+          dot.className = "status-dot correct";
+        } else if (userAnswers[i] === false) {
+          dot.className = "status-dot wrong";
+        } else {
+          dot.className = "status-dot";
+        }
+      }
+      // Auto Scroll Dot Status Aktif
+      var activeDot = document.getElementById("dot-" + currentQIndex);
+      if (activeDot) {
+        activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+
+    function loadQuestion() {
+      clearInterval(timerInterval);
+      isAnswered = false;
+      timeLeft = QUESTION_TIME;
+
+      var qData = allQuestions[currentQIndex];
+      document.getElementById("q-counter").innerText = `Soal ${currentQIndex + 1} / ${allQuestions.length}`;
+      document.getElementById("question-box").innerText = (currentQIndex + 1) + ". " + qData.q;
+      document.getElementById("next-btn").style.display = "none";
+
+      // Acak pilihan jawaban
+      var shuffledOptions = shuffleArray(qData.options);
+      var grid = document.getElementById("options-grid");
+      grid.innerHTML = "";
+
+      var prefixes = ["A", "B", "C", "D"];
+      shuffledOptions.forEach(function(optText, idx) {
+        var btn = document.createElement("button");
+        btn.className = "opt-btn";
+        btn.onclick = function() { selectAnswer(btn, optText, qData.correctText); };
+        
+        btn.innerHTML = `
+          <div class="opt-prefix">${prefixes[idx]}</div>
+          <div>${optText}</div>
+        `;
+        grid.appendChild(btn);
+      });
+
+      updateStatusDots();
+      startTimer();
+    }
+
+    function startTimer() {
+      updateTimerUI();
+      timerInterval = setInterval(function() {
+        timeLeft--;
+        updateTimerUI();
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          timeOutAnswer();
+        }
+      }, 1000);
+    }
+
+    function updateTimerUI() {
+      var minutes = Math.floor(timeLeft / 60);
+      var seconds = timeLeft % 60;
+      var timeStr = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+      
+      document.getElementById("timer-text").innerText = timeStr;
+      
+      var percentage = (timeLeft / QUESTION_TIME) * 100;
+      var bar = document.getElementById("timer-bar");
+      bar.style.width = percentage + "%";
+
+      if (timeLeft <= 15) {
+        bar.style.background = "#e63946";
+      } else if (timeLeft <= 45) {
+        bar.style.background = "#e76f51";
+      } else {
+        bar.style.background = "linear-gradient(90deg, #2a9d8f, #e76f51)";
+      }
+    }
+
+    function selectAnswer(selectedBtn, selectedText, correctText) {
+      if (isAnswered) return;
+      isAnswered = true;
+      clearInterval(timerInterval);
+
+      var isCorrect = (selectedText === correctText);
+      userAnswers[currentQIndex] = isCorrect;
+
+      var allBtns = document.querySelectorAll(".opt-btn");
+      allBtns.forEach(function(btn) {
+        btn.disabled = true;
+        var btnText = btn.children[1].innerText;
+        if (btnText === correctText) {
+          btn.classList.add("correct");
+        } else if (btn === selectedBtn && !isCorrect) {
+          btn.classList.add("wrong");
+        }
+      });
+
+      if (isCorrect) {
+        // Diubah menjadi 1 poin tiap soal benar
+        totalScore += 1;
+        document.getElementById("score-badge").innerText = "Poin: " + totalScore;
+      }
+
+      updateStatusDots();
+      showNextButton();
+    }
+
+    function timeOutAnswer() {
+      if (isAnswered) return;
+      isAnswered = true;
+      userAnswers[currentQIndex] = false;
+
+      var qData = allQuestions[currentQIndex];
+      var allBtns = document.querySelectorAll(".opt-btn");
+      
+      allBtns.forEach(function(btn) {
+        btn.disabled = true;
+        var btnText = btn.children[1].innerText;
+        if (btnText === qData.correctText) {
+          btn.classList.add("correct");
+        }
+      });
+
+      updateStatusDots();
+      showNextButton();
+    }
+
+    function showNextButton() {
+      var nextBtn = document.getElementById("next-btn");
+      if (currentQIndex < allQuestions.length - 1) {
+        nextBtn.innerText = "Soal Berikutnya ➔";
+      } else {
+        nextBtn.innerText = "SELESAI & LIHAT HASIL 🏆";
+      }
+      nextBtn.style.display = "block";
+    }
+
+    function nextQuestion() {
+      if (currentQIndex < allQuestions.length - 1) {
+        currentQIndex++;
+        loadQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      clearInterval(timerInterval);
+      var correctCount = userAnswers.filter(function(x) { return x === true; }).length;
+https://script.google.com/macros/s/AKfycbzMCdu-_Zm41gG5OO3wBmqgoZlnA9MTsHN0JTC1WMncKJ44vgr3WdBOYHrfeu9PKbHZ6w/exec
+fetch(GOOGLE_SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      nama: typeof userName !== 'undefined' ? userName : "Siswa",
+      kelas: typeof userClass !== 'undefined' ? userClass : "-",
+      nilai: typeof totalScore !== 'undefined' ? totalScore : correctCount
+    })
+  });
+      
+      document.body.innerHTML = `
+        <div style="min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#0d1b2a; color:#fff; text-align:center; padding:20px;">
+          <h1 style="color:#f4a261; font-size:28px; margin-bottom:15px;">KUIS SELESAI! 🏆</h1>
+          <div style="background:#1b263b; border:2px solid #2a9d8f; padding:20px; border-radius:15px; width:100%; max-width:350px; margin-bottom:20px;">
+            <p style="font-size:16px; margin-bottom:10px;">Jawaban Benar: <strong style="color:#2a9d8f;">${correctCount} / ${allQuestions.length}</strong></p>
+            <p style="font-size:20px; font-weight:bold; color:#f4a261;">Total Skor: ${totalScore}</p>
+          </div>
+          <button onclick="location.reload()" style="background:#2a9d8f; color:#fff; font-size:16px; font-weight:bold; padding:12px 30px; border:none; border-radius:25px; cursor:pointer;">MAIN LAGI</button>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
